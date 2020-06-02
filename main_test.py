@@ -34,8 +34,7 @@ def GetBackend(backend_name=None):
     if backend_name == None:
         backend = Aer.get_backend('qasm_simulator')
     else:
-        IBMQ.load_account()
-        provider = IBMQ.get_provider()
+        provider = IBMQ.load_account()
         backend = provider.get_backend(backend_name)
     return backend
 

@@ -42,4 +42,5 @@ IBMQAccountCredentialsNotFound: 'No IBM Quantum Experience credentials found.'
   solution at the end of post. We should include it there.
   
   Problem 2: We should let the user know that they need an IBM Q account
+following the steps in https://quantum-computing.ibm.com/account
 
