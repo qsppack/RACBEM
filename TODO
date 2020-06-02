@@ -1,0 +1,45 @@
+
+0. Make it easier to install the dependences, such as by giving the
+command to install the packages
+
+
+1. Here is what I got by first running the code from a fresh
+installation (Ubuntu 18.04)
+
+In [1]: %run main_test.py                                                                                       
+/home/linlin/.pyxbld/temp.linux-x86_64-3.8/pyrex/qutip/cy/openmp/parfuncs.cpp:616:10: fatal error: src/zspmv_openmp.hpp: No such file or directory
+ #include "src/zspmv_openmp.hpp"
+          ^~~~~~~~~~~~~~~~~~~~~~
+compilation terminated.
+---------------------------------------------------------------------------
+IBMQAccountCredentialsNotFound            Traceback (most recent call last)
+~/Projects/racbem/main_test.py in <module>
+     64     # retrieve backends and architectures
+     65     backend = GetBackend()
+---> 66     noise_backend = GetBackend(backend_name=backend_name)
+     67     coupling_map = noise_backend.configuration().coupling_map
+     68     noise_model = NoiseModel.from_backend(noise_backend)
+
+~/Projects/racbem/main_test.py in GetBackend(backend_name)
+     35         backend = Aer.get_backend('qasm_simulator')
+     36     else:
+---> 37         IBMQ.load_account()
+     38         provider = IBMQ.get_provider()
+     39         backend = provider.get_backend(backend_name)
+
+~/Software/anaconda3/envs/qiskit/lib/python3.8/site-packages/qiskit/providers/ibmq/ibmqfactory.py in load_account(self)
+    167 
+    168         if not credentials_list:
+--> 169             raise IBMQAccountCredentialsNotFound(
+    170                 'No IBM Quantum Experience credentials found.')
+    171 
+
+IBMQAccountCredentialsNotFound: 'No IBM Quantum Experience credentials found.'
+
+
+  Problem 1: zspmv_openmp.hpp compilation error. This is due to a problem
+  of Qutip (github.com/qutip/qutip/issues/1205). Jiahao contributed the
+  solution at the end of post. We should include it there.
+  
+  Problem 2: We should let the user know that they need an IBM Q account
+
