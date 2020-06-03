@@ -13,6 +13,7 @@
 # that they have been altered from the originals.
 
 """Generating random circuits according to the basis_gates and coupling_map.
+
 This code is modified from random_circuit function provided in Qiskit.
 This function generates random quantum circuit (RQC) faithfully according to 
 the basis_gates and coupling_map given in the arguments.
