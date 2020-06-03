@@ -100,6 +100,8 @@ if __name__ == '__main__':
     job_monitor(job)
     result = job.result()
     counts = result.get_counts(compiled_circ)
+    # both the signal and the ancilla qubit for block-encoding needs to
+    # be 0
     prob_meas = np.float(counts['00']) / n_shots
     # succ prob via noiseless simulator
     qsp.build_circuit(be.qc, be.qc_dag, phi_seq, realpart=True, measure=False)

@@ -67,7 +67,7 @@ def retrieve_unitary_matrix(qcircuit):
     job = execute(qcircuit, backend)
     result = job.result()
     UA = result.get_unitary(qcircuit)
-    # qiskit's column-major oder
+    # qiskit's column-major order
     UA_Qobj = Qobj(UA, dims=[[2]*n_tot_qubit, [2]*n_tot_qubit])
     # python's row-major order
     UA_Qobj_rowmajor = UA_Qobj.permute(np.arange(0,n_tot_qubit)[::-1])
@@ -83,7 +83,7 @@ def retrieve_state(qcircuit):
     job = execute(qcircuit, backend)
     result = job.result()
     state = result.get_statevector(qcircuit)
-    # qiskit's column-major oder
+    # qiskit's column-major order
     state_Qobj = Qobj(state, dims=[[2]*n_tot_qubit, [1]])
     # python's row-major order
     state_Qobj_rowmajor = state_Qobj.permute(np.arange(0,n_tot_qubit)[::-1])
@@ -102,8 +102,8 @@ def scale_noise_model(noise_model, sigma):
         
         'roerror': readout error.
             probabilities is of type np.array(np.array()). Each inner
-            array is a probability distribution. We assume the one
-            closer to 1.0 to be the 'correct' option. Example of
+            array is a discrete probability distribution. We assume the
+            one closest to 1.0 to be the 'correct' option. Example of
             scaling of the noise:
 
                 prob = [0.90, 0.06, 0.04]
@@ -116,7 +116,7 @@ def scale_noise_model(noise_model, sigma):
         'qerror': standard quantum error. There are two possibilities:
             'kraus': a Kraus operator. It is already a quantum channel,
                 and therefore 'probabilities' is always [1.0]. This type
-                of error mode is discarded.
+                of error mode is discarded at the moment.
 
             not 'kraus': scale it the same way as the 'roerror'.
             
@@ -184,19 +184,6 @@ class BlockEncoding(object):
         self.n_tot_qubit = n_be_qubit + n_sys_qubit
         self.qregs = QuantumRegister(self.n_tot_qubit, 'q')
 
-    def build_block_encoding(self):
-        """This gives a demo of the block-encoding U_A."""
-        if hasattr(self, 'qc'):
-            self.qc.data.clear()
-        qr = self.qregs
-        self.qc = QuantumCircuit(self.qregs, name='UA  ')
-
-        self.qc.h(qr[0])
-        self.qc.x(qr[0])
-        self.qc.cx(qr[0], qr[1])
-        self.qc.x(qr[0])
-        self.qc.cz(qr[0], qr[2])
-        self.qc.ry(pi * 2. / 3., qr[0])
 
     def build_random_circuit(self, n_depth, coupling_map=None, basis_gates=None, prob_one_q_op=0.5):
         """Build a random circuit as the block-encoding U_A.
