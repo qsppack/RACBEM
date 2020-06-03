@@ -40,6 +40,7 @@ def GetBackend(backend_name=None):
 
 if __name__ == '__main__':
     backend_name = 'ibmq_burlington'
+    #backend_name = None
     kappa = 5                   # condition number
     n_sys_qubit = 3             # the number of system qubits
     n_be_qubit = 1              # the number of block-encoding qubit

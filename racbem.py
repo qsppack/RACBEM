@@ -1,9 +1,10 @@
 """Module for RACBEM implemented using IBM's Qiskit.
 
-This is an implementation of the a RAndom Circuit Block Encoded Matrix
+This is an implementation of the RAndom Circuit Block Encoded Matrix
 (RACBEM) and its Hermitian conjugate. It is then used to build a quantum
 singular value circuit using the method of quantum singular value
-transformation (QSVT)
+transformation (QSVT).
+
 Take a RAndom Circuit Block Encoded Matrix (RACBEM), this function uses
 a quantum signal processing circuit to evaluate the matrix inverse,
 using the method of quantum singular value transformation (QSVT). This
@@ -12,7 +13,7 @@ manually.
 
 Be aware that Qiskit uses the column-major ordering of tensors (1st
 qubit goes first), instead of the standard row-major ordering of tensors
-(last qubit goes first). There is a global phase that could be missing.
+(last qubit goes first). There is a global phase factor that could be missing.
 
 References:
     Yulong Dong, Lin Lin. Random circuit block-encoded matrix and a proposal 
