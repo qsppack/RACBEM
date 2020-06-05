@@ -30,6 +30,9 @@ from qiskit.providers.aer.noise import NoiseModel
 
 from racbem import *
 
+import os
+import pickle
+
 def GetBackend(backend_name=None):
     if backend_name == None:
         backend = Aer.get_backend('qasm_simulator')
@@ -56,6 +59,8 @@ if __name__ == '__main__':
     # state |0^n>
     b = np.zeros((2**n_sys_qubit,))
     b[0] = 1.0
+    load_architecture = True    # True:     load architure locally
+                                # False:    need to save an IBM account beforehand
 
     # instances of RACBEM
     be = BlockEncoding(n_be_qubit, n_sys_qubit)
@@ -63,10 +68,23 @@ if __name__ == '__main__':
 
     # retrieve backends and architectures
     backend = GetBackend()
-    noise_backend = GetBackend(backend_name=backend_name)
-    coupling_map = noise_backend.configuration().coupling_map
-    noise_model = NoiseModel.from_backend(noise_backend)
-    tot_q_device = noise_backend.configuration().n_qubits
+    if load_architecture:
+        if os.path.exists(backend_name+'_backend_config.pkl'):
+            noise_backend = pickle.load(open(backend_name+'_backend_config.pkl','rb'))
+            noise_model = NoiseModel.from_dict(noise_backend['noise_dict'])
+            coupling_map = noise_backend['coupling_map']
+            tot_q_device = noise_backend['tot_q_device']
+            print("load architecture locally at: %s_backend_config.pkl\n"%(backend_name))
+        else:
+            raise Exception("no locally saved architecture: %s_backend_config.pkl"%(backend_name), load_architecture)
+    else:
+        noise_backend = GetBackend(backend_name=backend_name)
+        coupling_map = noise_backend.configuration().coupling_map
+        noise_model = NoiseModel.from_backend(noise_backend)
+        tot_q_device = noise_backend.configuration().n_qubits
+        pickle.dump({'noise_dict': noise_model.to_dict(), 'coupling_map': coupling_map, 'tot_q_device': tot_q_device, 
+                    'basis_gates': noise_backend.configuration().basis_gates}, open(backend_name+'_backend_config.pkl','wb'))
+        print("retrieve architecture from IBM Q and save locally at: %s_backend_config.pkl\n"%(backend_name))
     assert tot_q_device >= n_tot_qubit
     new_noise_model = scale_noise_model(noise_model, sigma)
 
@@ -89,7 +107,7 @@ if __name__ == '__main__':
     (svd_U, svd_S, svd_VH) = la.svd(A)
     print("kappa=%d, sigma=%.2f, polynomial approximation error=%.3e"%(kappa, sigma, app_err))
     print("")
-    print("Generic Block-Encoding")
+    print("Generic RACBEM")
     print("singular value (A) = \n", np.around(svd_S, decimals=3))
 
     # succ prob via measurement
@@ -129,7 +147,7 @@ if __name__ == '__main__':
     UA = retrieve_unitary_matrix(be.qc_dag)
     A_dag = UA[0:2**n_sys_qubit, 0:2**n_sys_qubit]
     (svd_U, svd_S, svd_VH) = la.svd(A)
-    print("Hermitian Block-Encoding")
+    print("Hermitian RACBEM")
     print("singular value (A) = \n", np.around(svd_S, decimals=3))
     print("condition number (A)  = %.3f"%(svd_S.max()/svd_S.min()))
     print("||A - A^\dagger||_2   = %.3e"%(la.norm(A - A_dag)))
