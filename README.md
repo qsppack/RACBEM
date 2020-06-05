@@ -135,3 +135,60 @@ condition number (A)  = 4.074
 ||A - A^\dagger||_2   = 2.675e-15
 ```
 
+
+
+## Generating phase factors using QSPPACK
+
+To implement QSVT, a set of phase factors which characterizes the target function is needed. You can generate phase factors by using **QSPPACK**.
+
+### Installing Instruction:
+
+1. Download the latest source code in our Github repository. https://github.com/qsppack/QSPPACK
+
+2. Go to the directory where you save QSPPACK and run the following command in **Matlab** terminal.
+
+   `>> startup`
+
+### Running the demo:
+
+We provide a demo code to generate phase factors which solve QLSP whose condition number is upper bounded. You can follow the steps below after you set up QSPPACK.
+
+1. Open `Remez.ipynb` in **jupyter notebook**. Make sure you installed **Julia** language. See https://julialang.org for details.
+
+   Run `jupyter notebook` or `LANG=zn jupyter notebook` in terminal under the directory of RACBEM to open the notebook.
+
+2. Run the code in the notebook. A data file `coef_5_6.mat` will apear in your directory. A polynomial approximation is saved in that file.
+
+3. In **Matlab** terminal under the directory of RACBEM, run `>> GeneratePhi(5,6)`. You will get 2 figures, the following messages, and a txt file `phi_inv_5.txt` in which the informations about phase factors are saved.
+
+   ```
+   approx error (inf) of coef = 0.0223098
+   extra scaling factor = 1.17326
+   total scaling factor = 5.86631
+   L-BFGS solver started 
+   iter          obj  stepsize des_ratio
+      1  +3.3827e-03 +1.00e+00 +4.95e-01
+      2  +1.0600e-03 +1.00e+00 +7.08e-01
+      3  +8.8408e-05 +1.00e+00 +6.04e-01
+      4  +3.9504e-06 +1.00e+00 +6.05e-01
+      5  +6.4384e-08 +1.00e+00 +5.41e-01
+      6  +1.0029e-09 +1.00e+00 +5.38e-01
+      7  +2.7395e-11 +1.00e+00 +5.60e-01
+      8  +5.8496e-14 +1.00e+00 +5.14e-01
+      9  +7.4040e-17 +1.00e+00 +5.15e-01
+     10  +8.5125e-21 +1.00e+00 +5.04e-01
+   iter          obj  stepsize des_ratio
+     11  +5.2673e-24 +1.00e+00 +5.06e-01
+     12  +7.8591e-27 +1.00e+00 +5.16e-01
+   Stop criteria satisfied.
+   - Info: 		QSP phase factors --- solved by L-BFGS
+   - Parity: 		even
+   - Degree: 		6
+   - Iteration times: 	12
+   - CPU time: 	0.0 s
+   approx error (inf) of polynomial = 1.384e-13
+   approx error (inf) of g circ h = 1.902e-02
+   ```
+
+   
+
