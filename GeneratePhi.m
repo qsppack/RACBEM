@@ -101,5 +101,3 @@ dlmwrite("phi_inv_"+num2str(kappa)+".txt", data,'precision','%25.15f')
 close all
 
 end
-
-%--------------------------------------------------------------------------
