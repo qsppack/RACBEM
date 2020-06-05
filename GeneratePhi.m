@@ -9,7 +9,7 @@
 % provided in the package are used.
 %
 % parameters
-%     kappa: parameters of approximation
+%     kappa: condition number
 %     deg: degree of the polynomial approximation
 %     criteria: stop criteria of qsppack, default 1e-12
 %
