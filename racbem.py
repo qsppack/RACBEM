@@ -204,6 +204,7 @@ class BlockEncoding(object):
 
     def build_dag(self):
         """Build the circuit for U_A^{\dagger}."""
+        assert hasattr(self, 'qc')
         if hasattr(self, 'qc_dag'):
             self.qc_dag.data.clear()
         self.qc_dag = self.qc.inverse()
@@ -354,7 +355,7 @@ class QSPCircuit(object):
             self.qcircuit.measure(qr[0:2], cr[0:2])
 
 
-class Hermitian_BlockEncoding(BlockEncoding):
+class Hermitian_BlockEncoding(object):
     """Implementation of a Hermitian-RACBEM via Qiskit.
 
     Attributes:
@@ -365,8 +366,15 @@ class Hermitian_BlockEncoding(BlockEncoding):
         phi_seq -- phi sequence used in quadratic QSVT
     """
     def __init__(self, n_be_qubit, n_sys_qubit):
-        super(Hermitian_BlockEncoding, self).__init__(n_be_qubit, n_sys_qubit)
-        self.qsp = QSPCircuit(1, n_be_qubit, n_sys_qubit)
+        # The first be-qubit is excluded as sig_qubit in 
+        # quadratic QSVT. Thus, n_be_qubit must >= 2
+        assert n_be_qubit >= 2
+        self.n_be_qubit = n_be_qubit
+        self.n_sys_qubit = n_sys_qubit
+        self.n_tot_qubit = n_be_qubit + n_sys_qubit
+        self.qregs = QuantumRegister(self.n_tot_qubit, 'q')
+        # QSPCircuit object is used to build a generic H-RACBEM
+        self.qsp = QSPCircuit(1, n_be_qubit-1, n_sys_qubit)
 
     def set_ab(self, a, b):
         """Construct phi_seq according to h(x) = a*x^2+b"""
@@ -376,7 +384,7 @@ class Hermitian_BlockEncoding(BlockEncoding):
         self.phi_seq = np.array([phi0,phi1,phi0])
 
     def shift_spectrum(self, c):
-        """ Shift the spectrum of the Hermitian Block-Encoding
+        """Shift the spectrum of the Hermitian Block-Encoding
         Let tilde A = h(A), where h(x) = ax^2+b and A is the block-encoding
         this function further shifts tilde A by a constant c
         set (a,b) to output a (1+|c|,2,0)-block-encoding of the
@@ -394,17 +402,56 @@ class Hermitian_BlockEncoding(BlockEncoding):
         self.set_ab(1-1.0/cndnum, 1.0/cndnum)
 
     def build_random_circuit(self, n_depth, coupling_map=None, basis_gates=None, prob_one_q_op=0.5):
-        """Build a random circuit as the Hermitian block-encoding as U_A.
+        """Build a random circuit as the Hermitian block-encoding as U_H.
         
         Args: refer to those in Block-Encoding::build_random_circuit()
         """
         assert hasattr(self, 'phi_seq')
         if hasattr(self, 'qc'):
             self.qc.data.clear()
-        qc = random_circuit(self.n_tot_qubit, n_depth,
+        # n_tot_qubit-1: exclude the first be_qubit as sig_qubit in quadratic QSVT
+        qc = random_circuit(self.n_tot_qubit-1, n_depth,
                 coupling_map=coupling_map, basis_gates=basis_gates, prob_one_q_op=prob_one_q_op)
         qc.name = 'UA_0  '
         self.qsp.build_circuit(qc, qc.inverse(), self.phi_seq,
                 realpart=True, measure=False)
         self.qc = self.qsp.qcircuit
-        self.qc.name = 'UA  '
+        self.qc.name = 'UH  '
+
+    def build_dag(self):
+        """Build the circuit for U_H^{\dagger}."""
+        assert hasattr(self, 'qc')
+        if hasattr(self, 'qc_dag'):
+            self.qc_dag.data.clear()
+        self.qc_dag = self.qc.inverse()
+
+    def build_canonical_hracbem(self, n_depth, coupling_map=None, basis_gates=None, prob_one_q_op=0.5):
+        """Build a random circuit as the canonical Hermitian block-encoding as U_H.
+        The circuit is shown in Fig.12 in the reference.
+        
+        Args: refer to those in Block-Encoding::build_random_circuit()
+        """
+        # so far the code only works with two block encoding qubits due
+        # to the implementation of the multi-qubit Toffoli gate.
+        assert self.n_be_qubit == 2
+        if hasattr(self, 'qc'):
+            self.qc.data.clear()
+        else:
+            self.qc = QuantumCircuit(self.qregs, name='UH  ')
+        # n_tot_qubit-1: exclude the first be_qubit as sig_qubit in quadratic QSVT
+        qc = random_circuit(self.n_tot_qubit-1, n_depth,
+                coupling_map=coupling_map, basis_gates=basis_gates, prob_one_q_op=prob_one_q_op)
+        qc.name = 'UA_0  '
+        qr = self.qregs
+        self.qc.h(qr[0])
+        self.qc.t(qr[0])
+        self.qc.append(qc.to_instruction(), qr[1:])
+        # Perform control-1, do not need to add X gate.
+        self.qc.cx(qr[1], qr[0])
+        self.qc.sdg(qr[0])
+        self.qc.cx(qr[1], qr[0])
+        self.qc.append(qc.inverse().to_instruction(), qr[1:])
+        self.qc.t(qr[0])
+        self.qc.h(qr[0])
+        self.qc.name = 'UH  '
+
