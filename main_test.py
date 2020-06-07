@@ -137,6 +137,7 @@ if __name__ == '__main__':
     print("")
 
     # instance of Hermitian Block-Encoding
+    n_be_qubit = n_be_qubit + 1     # add one extra qubit as sig_qubit in quadratic QSVT
     be = Hermitian_BlockEncoding(n_be_qubit, n_sys_qubit)
     be.set_cndnum(kappa)
     be.build_random_circuit(n_depth, basis_gates=basis_gates, 
