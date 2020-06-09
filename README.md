@@ -72,7 +72,7 @@ Take a RAndom Circuit Block Encoded Matrix (RACBEM), this function uses a quantu
 
 ## References
 
-+ Yulong Dong, Lin Lin. Random circuit block-encoded matrix and a proposal of quantum LINPACK benchmark
++ [Yulong Dong, Lin Lin. Random circuit block-encoded matrix and a proposal of quantum LINPACK benchmark. arXiv: 2006.04010](http://arxiv.org/abs/2006.04010)
 + [Y. Dong, X. Meng, K. B. Whaley, and L. Lin. Efficient Phase Factor Evaluation in Quantum Signal Processing. arXiv: 2002.11649](https://arxiv.org/abs/2002.11649)
 + [A. Gilyén, Y. Su, G. H. Low, and N. Wiebe. Quantum singular value transformation and beyond: exponential improvements for quantum matrix arithmetics. In Proceedings of the 51st Annual ACM SIGACT Symposium on Theory of Computing, pages 193–204, 2019](https://dl.acm.org/doi/10.1145/3313276.3316366)
 
