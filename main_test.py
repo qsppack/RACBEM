@@ -90,7 +90,7 @@ if __name__ == '__main__':
 
     # exclude qubit 0 as signal qubit, shift the remaining labels by -1
     be_map = [[q[0]-1,q[1]-1] for q in coupling_map if (0 not in q) and 
-            (q[0] <= n_tot_qubit) and (q[1] <= n_tot_qubit)]
+            (q[0] < n_tot_qubit) and (q[1] < n_tot_qubit)]
     be.build_random_circuit(n_depth, basis_gates=basis_gates, 
             prob_one_q_op=prob_one_q_op, coupling_map=be_map)
     be.build_dag()
